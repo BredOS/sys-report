@@ -2,24 +2,39 @@
 
 import sys, os, shutil, subprocess
 
+
 def installed(command):
     return shutil.which(command) is not None
+
 
 def prompt_install(command):
     print(f"The command '{command}' is not installed. Please install it and try again.")
     sys.exit(1)
 
+
 def run_command(command):
     try:
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        result = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"Error running command '{' '.join(command)}': {e.stderr}")
         sys.exit(1)
 
+
 def upload_to_termbin(data):
     try:
-        process = subprocess.Popen(['nc', 'termbin.com', '9999'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+        process = subprocess.Popen(
+            ["nc", "termbin.com", "9999"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+        )
         url, _ = process.communicate(input=data)
         if process.returncode == 0:
             return url.strip()
@@ -57,28 +72,41 @@ def main():
     neofetch_installed = installed("neofetch")
     fastfetch_installed = installed("fastfetch")
 
-    commands = [['inxi', '-Fzxxx'], ['lspci'], ['lsusb'], ["pacman", "-Q"], ['dmesg']]
+    commands = [
+        ["lspci"],
+        ["lsusb"],
+        ["sh", "-c", "ls /dev/ttyACM* /dev/ttyUSB* /dev/ttyS* 2>/dev/null || true"],
+        ["inxi", "-Fzxxx"],
+        ["env"],
+        ["pacman", "-Q"],
+    ]
 
     if fastfetch_installed:
         commands.append(["fastfetch"])
     elif neofetch_installed:
         commands.append(["neofetch"])
     else:
-        print("Neither neofetch or fastfetch are installed! For a complete report, please install either.")
+        print(
+            "Neither neofetch or fastfetch are installed! For a complete report, please install either."
+        )
+
+    commands.append(["dmesg"])  # Big, leave it last.
 
     if not ok:
         return
 
-
     # Run commands and gather outputs
-    debug_data = "BredOS System Reporter v1.0\n"
+    debug_data = "BredOS System Reporter v1.1\n"
     for cmd in commands:
         debug_data += f"\n=== Output of {' '.join(cmd)} ===\n"
         debug_data += run_command(cmd)
 
     # Upload data to termbin
     url = upload_to_termbin(debug_data)
-    print(f"Debug data uploaded successfully: {url}")
+    print(
+        f"Debug data uploaded successfully: {url}Support: https://discord.gg/beSUnWGVH2"
+    )
+
 
 if __name__ == "__main__":
     main()
