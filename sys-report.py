@@ -75,16 +75,17 @@ def main():
     commands = [
         ["lspci"],
         ["lsusb"],
+        ["lsusb -v"],
         ["sh", "-c", "ls /dev/ttyACM* /dev/ttyUSB* /dev/ttyS* 2>/dev/null || true"],
-        ["inxi", "-Fzxxx"],
+        ["inxi", "-ezrmxxfiv", "8"],
         ["env"],
         ["pacman", "-Q"],
     ]
 
     if fastfetch_installed:
-        commands.append(["fastfetch"])
+        commands.append(["fastfetch", "--logo", "none", "--color", "0"])
     elif neofetch_installed:
-        commands.append(["neofetch"])
+        commands.append(["neofetch", "--off"])
     else:
         print(
             "Neither neofetch or fastfetch are installed! For a complete report, please install either."
@@ -99,6 +100,7 @@ def main():
     debug_data = "BredOS System Reporter v1.1\n"
     for cmd in commands:
         debug_data += f"\n=== Output of {' '.join(cmd)} ===\n"
+        print(f"Running {' '.join(cmd)}\n")
         debug_data += run_command(cmd)
 
     # Upload data to termbin
@@ -106,6 +108,7 @@ def main():
     print(
         f"Debug data uploaded successfully: {url}Support: https://discord.gg/beSUnWGVH2"
     )
+    print("That URL contains information about your system, which makes it easy for us to help you!")
 
 
 if __name__ == "__main__":
