@@ -75,6 +75,8 @@ def main():
     commands = [
         ["lspci"],
         ["lsusb"],
+        ["lsblk"],
+        ["df", "-h"],
         ["sh", "-c", "ls /dev/ttyACM* /dev/ttyUSB* /dev/ttyS* 2>/dev/null || true"],
         ["inxi", "-ezrmxxfiv", "8"],
         ["env"],
